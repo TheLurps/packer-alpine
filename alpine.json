@@ -24,11 +24,13 @@
       "iso_checksum": "{{user `iso_checksum_type`}}:{{user `iso_checksum`}}",
       "iso_urls": ["{{user `iso_local_url`}}", "{{user `iso_download_url`}}"],
       "keep_registered": "false",
+      "output_directory": "{{ user `build_directory` }}/{{ user `vm_name` }}",
       "shutdown_command": "/sbin/poweroff",
       "ssh_password": "{{user `ssh_password`}}",
       "ssh_timeout": "10m",
       "ssh_username": "root",
       "type": "virtualbox-iso",
+      "skip_export": true,
       "vboxmanage": [
         ["modifyvm", "{{.Name}}", "--memory", "{{user `memory`}}"],
         ["modifyvm", "{{.Name}}", "--cpus", "{{user `cpus`}}"],
@@ -64,6 +66,41 @@
         "sed '/PermitRootLogin yes/d' -i /etc/ssh/sshd_config"
       ],
       "type": "shell"
+    },
+    {
+      "type": "file",
+      "direction": "upload",
+      "sources": [
+        "{{ template_dir }}/patches/linux-live-{{user `linux_live_version`}}.patch"
+      ],
+      "destination": "/tmp/linux-live-{{user `linux_live_version`}}.patch"
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "LINUX_LIVE_VERSION={{ user `linux_live_version` }}"
+      ],
+      "inline": [
+        "wget https://github.com/Tomas-M/linux-live/archive/refs/tags/v$LINUX_LIVE_VERSION.tar.gz -O /tmp/linux-live-$LINUX_LIVE_VERSION.tar.gz",
+        "tar xzvf /tmp/linux-live-$LINUX_LIVE_VERSION.tar.gz -C /tmp",
+        "apk add patch",
+        "patch -s -p0 --directory=/tmp/linux-live-$LINUX_LIVE_VERSION < /tmp/linux-live-$LINUX_LIVE_VERSION.patch",
+        "apk add bash"
+      ]
+    },
+    {
+      "type": "shell",
+      "environment_vars": [
+        "LINUX_LIVE_VERSION={{ user `linux_live_version` }}"
+      ],
+      "execute_command": "echo 'packer' | {{ .Vars }} sudo -S -E bash '{{ .Path }}'",
+      "scripts": ["{{ template_dir }}/scripts/build_live_boot.sh"]
+    },
+    {
+      "type": "file",
+      "direction": "download",
+      "sources": ["/tmp/linux-x86_64.iso", "/tmp/linux-x86_64.zip"],
+      "destination": "{{ user `build_directory` }}/{{ user `vm_name` }}/"
     }
   ],
   "variables": {
@@ -78,6 +115,8 @@
     "ssh_key": "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6NF8iallvQVp22WDkTkyrtvp9eWW6A8YVr+kz4TjGYe7gHzIw+niNltGEFHzD8+v1I2YJ6oXevct1YeS0o9HZyN1Q9qgCgzUFtdOKLv6IedplqoPkcmF0aYet2PkEDo3MlTBckFXPITAMzF8dJSIFo9D8HfdOV0IAdx4O7PtixWKn5y2hMNG0zQPyUecp4pzC6kivAIhyfHilFR61RGL+GPXQ2MWZWFYbAGjyiYJnAmCP3NOTd0jMZEnDkbUvxhMmBYSdETk1rRgm+R4LOzFUGaHqHDLKLX+FIPKcF96hrucXzcWyLbIbEgE98OHlnVYCzRdK8jlqm8tehUc9c9WhQ== vagrant insecure public key",
     "ssh_password": "vagrant",
     "ssh_username": "vagrant",
-    "vm_name": "alpine-3.15.4-x86_64"
+    "vm_name": "alpine-3.15.4-x86_64",
+    "build_directory": "build",
+    "linux_live_version": "2.6"
   }
 }
