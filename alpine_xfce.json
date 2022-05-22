@@ -79,9 +79,10 @@
       "type": "file",
       "direction": "upload",
       "sources": [
-        "{{ template_dir }}/patches/linux-live-{{user `linux_live_version`}}.patch"
+        "{{ template_dir }}/patches/linux-live-{{user `linux_live_version`}}.patch",
+        "{{ template_dir }}/patches/lightdm.patch"
       ],
-      "destination": "/tmp/linux-live-{{user `linux_live_version`}}.patch"
+      "destination": "/tmp/"
     },
     {
       "type": "shell",
@@ -93,6 +94,7 @@
         "tar xzvf /tmp/linux-live-$LINUX_LIVE_VERSION.tar.gz -C /tmp",
         "apk add patch",
         "patch -s -p0 --directory=/tmp/linux-live-$LINUX_LIVE_VERSION < /tmp/linux-live-$LINUX_LIVE_VERSION.patch",
+        "patch -s -p0 --directory=/etc/lightdm < /tmp/lightdm.patch",
         "apk add bash"
       ]
     },
