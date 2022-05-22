@@ -1,19 +1,21 @@
 diff --color -ruN ../linux-live-2.6.orig/bootfiles/syslinux.cfg ./bootfiles/syslinux.cfg
 --- ../linux-live-2.6.orig/bootfiles/syslinux.cfg	2022-05-20 23:38:24.515627421 +0200
-+++ ./bootfiles/syslinux.cfg	2022-05-21 00:19:35.535740236 +0200
++++ ./bootfiles/syslinux.cfg	2022-05-22 17:04:57.344435970 +0200
 @@ -8,11 +8,11 @@
  
  LABEL default
  MENU LABEL Run Linux
 -KERNEL /boot/vmlinuz
+-APPEND vga=769 initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0
 +KERNEL /boot/vmlinuz-virt
- APPEND vga=769 initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0
++APPEND initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0
  
  LABEL default
  MENU LABEL Run Linux debug
 -KERNEL /boot/vmlinuz
+-APPEND vga=769 initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0 debug
 +KERNEL /boot/vmlinuz-virt
- APPEND vga=769 initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0 debug
++APPEND initrd=/boot/initrfs.img load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 apparmor=0 debug
  
 diff --color -ruN ../linux-live-2.6.orig/config ./config
 --- ../linux-live-2.6.orig/config	2022-05-20 23:38:24.519627207 +0200
