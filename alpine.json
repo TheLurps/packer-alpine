@@ -63,7 +63,12 @@
         "echo {{user `ssh_key`}} > .ssh/authorized_keys",
         "chown -R $user .ssh",
         "echo disable ssh root login",
-        "sed '/PermitRootLogin yes/d' -i /etc/ssh/sshd_config"
+        "sed '/PermitRootLogin yes/d' -i /etc/ssh/sshd_config",
+        "echo vboxsf >> /etc/modules",
+        "apk add util-linux",
+        "mv -v /etc/init.d/agetty /etc/init.d/agetty-autologin.tty1",
+        "rc-update add agetty-autologin.tty1 default"
+
       ],
       "type": "shell"
     },
@@ -71,9 +76,10 @@
       "type": "file",
       "direction": "upload",
       "sources": [
-        "{{ template_dir }}/patches/linux-live-{{user `linux_live_version`}}.patch"
+        "{{ template_dir }}/patches/linux-live-{{user `linux_live_version`}}.patch",
+        "{{ template_dir }}/patches/conf.d.patch"
       ],
-      "destination": "/tmp/linux-live-{{user `linux_live_version`}}.patch"
+      "destination": "/tmp/"
     },
     {
       "type": "shell",
@@ -85,6 +91,7 @@
         "tar xzvf /tmp/linux-live-$LINUX_LIVE_VERSION.tar.gz -C /tmp",
         "apk add patch",
         "patch -s -p0 --directory=/tmp/linux-live-$LINUX_LIVE_VERSION < /tmp/linux-live-$LINUX_LIVE_VERSION.patch",
+        "patch -s -p0 --directory=/etc/conf.d < /tmp/conf.d.patch",
         "apk add bash"
       ]
     },
