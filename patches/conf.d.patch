@@ -1,5 +1,0 @@
---- /dev/null
-+++ ./agetty-autologin
-@@ -0,0 +1,2 @@
-+agetty_options="--autologin vagrant --noclear"
-+
